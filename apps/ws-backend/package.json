@@ -1,0 +1,25 @@
+{
+  "name": "ws-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm run build && pnpm run start",
+    "build": "tsc -b",
+    "start": "node -r dotenv/config dist/index.js"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.8.3",
+    "@repo/types": "*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "ws": "^8.18.2"
+  }
+}

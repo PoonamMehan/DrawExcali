@@ -1,0 +1,19 @@
+{
+  "name": "@repo/types",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./*": "./*.ts"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.25.57"
+  }
+}
