@@ -22,7 +22,7 @@ export const jwtVerifier = (req:UserReq, res:Response, next: NextFunction)=>{
 
         if(decodedToken){
             req.userId = decodedToken.userId;
-            next();
+            return next();
         }else{
             res.status(403).json({
                 errorMessage: "Unauthorized"

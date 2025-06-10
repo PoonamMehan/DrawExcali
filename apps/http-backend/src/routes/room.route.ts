@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import { jwtVerifier } from "../middlewares/auth.middleware.js"
-import {UserReq} from "@repo/common-backend/config";
+import {UserReq} from "@repo/types/allTypes";
 
 const router = Router();
 

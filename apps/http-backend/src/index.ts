@@ -5,7 +5,6 @@ import { Request, Response } from "express";
 import { router as userRouter } from './routes/user.route.js';
 import cookieParser from 'cookie-parser';
 import {router as roomRouter } from './routes/room.route.js';
-import { Secret } from 'jsonwebtoken';
 
 
 dotenv.config({
