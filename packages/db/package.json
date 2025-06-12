@@ -1,0 +1,21 @@
+{
+  "name": "@repo/db",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "prisma": "^6.9.0",
+    "typescript": "^5.8.3"
+  },
+  "exports": {
+    "./index": "./dist/index.js"
+  }
+}
