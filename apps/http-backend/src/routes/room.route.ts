@@ -3,6 +3,7 @@ import { jwtVerifier } from "../middlewares/auth.middleware.js"
 import {UserReq} from "@repo/types/allTypes";
 import { CreateRoomSchema } from "@repo/types/allTypes";
 import { Prisma, prisma } from "@repo/db/index";
+import { number } from "zod";
 
 const router = Router();
 
@@ -24,6 +25,9 @@ const createRoomHandler = async(req:UserReq, res:Response)=>{
                         id: userId
                     }
                 },
+                chats: {
+                    connect: []
+                }
             }
 
         const createdRoom = await prisma.room.create({
@@ -55,14 +59,95 @@ const createRoomHandler = async(req:UserReq, res:Response)=>{
     
 }
 
-const getOldChatsHandler = (req: UserReq, res: Response)=>{
+const getOldChatsHandler = async (req: UserReq, res: Response)=>{
+    const roomIdInput = req.params["roomId"];
+    if(!roomIdInput){
+        res.status(400).json({
+            errorMessage: "Send a room Id in endpoint request url."
+        })
+        return;
+    }
 
-    res.json
+    const roomId: number  = parseInt(roomIdInput)
+    if(isNaN(roomId)){
+        res.status(400).json({
+            errorMessage: "Send a valid number as room Id in endpoint request url."
+        })
+        return;
+    }
+    let allChats;
+    try{
+        allChats = await prisma.room.findUnique({
+            where:{
+                id: roomId
+            },
+            select: {
+                chats: {
+                    take: 30,
+                    orderBy: {
+                        id: 'desc'
+                    },
+                    select: {
+                        message: {
+                            select: {
+                                shapeName: true,
+                                startX: true,
+                                startY: true,
+                                endX: true,
+                                endY: true,
+                                text: true
+                            }
+                        }
+                    }
+                }, 
+            }
+        })
+    }catch(err){
+        res.status(500).json({
+            errorMessage: "Something went wrong at the server while fetching chats from db."
+        })
+        return;
+    }
+    if(!allChats){
+        res.status(400).json({
+            errorMessage: "Something went wrong, there are no chats for this room in db."
+        })
+        return;
+    }
+    res.status(200).json(allChats)
+}
+
+const getRoomId = async(req: UserReq, res: Response)=>{
+    const roomSlug = req.body.roomSlug;
+
+    let roomId;
+    try{
+        roomId = await prisma.room.findUnique({
+            where: {
+                slug: roomSlug
+            }, 
+            select: {
+                id: true
+            }
+        })
+        if(!roomId){
+            return res.status(400).json({
+                errorMessage: "There is no room with this slug"
+            })
+        }
+    }catch(err: any){
+        return  res.status(500).json({
+                errorMessage: "Something went wrong at the server while fetching details from db "+ err.message
+            })
+    }
+   
+    res.status(200).json(roomId);
 }
 
 
-router.route("/getRoomId").post(jwtVerifier, createRoomHandler as any)
-router.route("/getChat/:roomId").post(jwtVerifier, getOldChatsHandler);
+router.route("/create-room").post(jwtVerifier, createRoomHandler as any);
+router.route("/getChat/:roomId").get(jwtVerifier, getOldChatsHandler);
+router.route("/get-roomId").post(jwtVerifier, getRoomId as any);
 
 
 export {router};

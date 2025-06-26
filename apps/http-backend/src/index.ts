@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 import { router as userRouter } from './routes/user.route.js';
 import cookieParser from 'cookie-parser';
 import {router as roomRouter } from './routes/room.route.js';
+import {router as chatRouter} from './routes/chat.route.js';
 
 
 dotenv.config({
@@ -16,7 +17,8 @@ const app = express();
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cors({
-    origin: "*"
+    origin: "*",
+    credentials: true
 }))
 app.use(cookieParser());
 
@@ -28,6 +30,8 @@ app.get("/", (req: Request, res: Response)=>{
 app.use("/api/user", userRouter);
 
 app.use("/api/room", roomRouter);
+
+app.use("/api/chat", chatRouter);
 
 const server = app.listen(8000, ()=>{
     console.log("Server is listening on port 8000")

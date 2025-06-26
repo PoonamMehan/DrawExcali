@@ -9,6 +9,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@repo/db": "*",
     "@repo/typescript-config": "*",
     "@types/ws": "^8.18.1",
     "typescript": "^5.8.3",
