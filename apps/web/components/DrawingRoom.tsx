@@ -40,7 +40,7 @@ export function DrawingRoom({id}:{id: number}){
     
 
     return(
-        <div>
+        <div className="h-full w-full overflow-hidden">
             <DrawingRoomClient drawings={drawings} id={id}/>
         </div>
         

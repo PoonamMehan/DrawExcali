@@ -83,7 +83,7 @@ const getOldChatsHandler = async (req: UserReq, res: Response)=>{
             },
             select: {
                 chats: {
-                    take: 30,
+                    take: 100,
                     orderBy: {
                         id: 'desc'
                     },

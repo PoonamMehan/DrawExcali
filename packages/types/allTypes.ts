@@ -6,7 +6,7 @@ export interface UserReq extends Request {
     userId?: string
 }
 
-const tokenSecretSchema = z.custom<Secret>((val)=>val.length > 0)
+const tokenSecretSchema = z.custom<Secret>((val)=>val?.length > 0)
 const envSchema = z.object({
     ACCESS_TOKEN_SECRET: tokenSecretSchema
 })
@@ -20,14 +20,14 @@ export interface UserSignup {
 }
 
 export const SignupSchema = z.object({
-    email: z.string().email(),
+    email: z.string().email("Please enter a valid email."),
     username: z.string().optional(),
-    password: z.string().min(6).max(100)
+    password: z.string().min(6, "Password must be atleast 6 characters long.").max(100, "password cannot be logner than 100 characters.")
 })
 export const LoginSchema = z.object({
-    email: z.string().email().optional(),
+    email: z.string().email("Please enter a valid email.").optional(),
     username: z.string().optional(),
-    password: z.string().min(6).max(100)
+    password: z.string().min(6,"Password must be atleast 6 characters long.").max(100, "Password cannot be logner than 100 characters.")
 })
 
 export const CreateRoomSchema = z.object({

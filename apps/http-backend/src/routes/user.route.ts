@@ -68,7 +68,7 @@ const signupHandler = async(req: Request, res: Response) => {
                 errorMessage: `User with this ${err.meta.target[0]} already exists.`
             })
         }
-        return res.status(400).json({
+        return res.status(500).json({
             errorMessage: 'User creation failed, try again. '+err.message
         })
     }

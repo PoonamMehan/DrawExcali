@@ -3,6 +3,7 @@ import { useSocket } from "../hooks/useSocket"
 import { useState, useEffect, useRef } from "react";
 import { drawArrow, drawCircle, drawDiamond, drawRectangle, drawText } from "../utils/allShapes";
 import axios from 'axios';
+import { MousePointer, RectangleHorizontal, Circle, Diamond, ArrowUp, ALargeSmall, Plus, Minus, Hand } from 'lucide-react';
 
 
 export function DrawingRoomClient({
@@ -37,8 +38,14 @@ export function DrawingRoomClient({
     const [aiAnswerGenerating, setAiAnswerGenerating] = useState(false);
     const token = localStorage.getItem('Token');
 
-
     const [currSelectedShape, setCurrSelectedShape] = useState("Pointer");
+
+    const [scale, setScale] = useState(1.0);
+    const scaleMultiplier = 0.8;
+    // const [ translatePos, setTranslatePos ] = useState({ x:(window.innerWidth/2)-2500, y:(window.innerHeight/2)-2500});
+    const [ translatePos, setTranslatePos ] = useState({ x:0, y:0 });
+    const [panning, setPanning] = useState(false)
+
     
 
     useEffect(()=>{
@@ -46,6 +53,50 @@ export function DrawingRoomClient({
             inputRef.current.focus();
         }
     }, [startInputTaking])
+
+    //this will center the canvas at the very start
+    useEffect(()=>{
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext('2d'); 
+        // ctx?.translate((window.innerWidth/2)-2500, (window.innerHeight/2)-2500);
+        ctx?.save();
+        if(canvas?.width && canvas?.height){
+            ctx?.translate(canvas?.width/2, canvas?.height/2)
+        }
+        ctx?.scale(2, 2)
+        if(ctx){
+            ctx.strokeStyle = "white";
+            ctx.strokeRect(-100, -100, 200, 200);
+        }
+        ctx?.restore();
+
+    }, [])
+
+    // useEffect(()=>{
+    //     const canvas = canvasRef.current;
+    //     const ctx = canvas?.getContext('2d');
+    //     if(ctx){
+    //         ctx.strokeStyle = "white";
+            
+            // ctx.strokeRect(2500, 2500, 50, 50);
+    //         ctx.strokeRect(2501, 2501, 50, 50);
+    //         // ctx.restore();
+    //         // alert(scale)
+        // }
+        
+    // }, [scale])
+
+
+    //scale
+        //write xoom out logic
+        //center the origin
+        //clear the canvas rightly
+        //right coordinates to draw things
+    //panning
+
+    
+
+    
 
     useEffect(()=>{
         //write useEffect
@@ -57,27 +108,42 @@ export function DrawingRoomClient({
             if(!ctx){
                 return;
             }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(translatePos.x, translatePos.y);
+            ctx.scale(scale, scale);
+            ctx.strokeStyle = "white";
             drawingChats.map((val)=>{
                 console.log("Rendering image", drawingChats);
+                
                 if(val.shapeName === 'Rectangle'){
+                    
                     drawRectangle(ctx, val.startX, val.startY, val.endX, val.endY);
+                    
                 }else if(val.shapeName === 'Circle'){
+                    
                     drawCircle(ctx, val.startX, val.startY, val.endX);
+                    
                 }else if(val.shapeName === 'Diamond'){
-                    drawDiamond(ctx, val.startX, val.startY, val.endX, val.endY);   
+                    
+                    drawDiamond(ctx, val.startX, val.startY, val.endX, val.endY);  
+                      
                 }else if (val.shapeName === 'Arrow'){
+                    
                     drawArrow(ctx, val.startX, val.startY, val.endX, val.endY);
+                    
                 }else if(val.shapeName === 'Text'){
                     if(val.text){
                         drawText(ctx, val.startX, val.startY, val.text);
                     }
                 }
             })
+            ctx.restore();
         }
-
-
-
-    }, [drawingChats])
+        //rightX rightY
+        //state (!oldVal) boolean, add in its dependency array.
+        //useState or functions to handlescale change
+    }, [drawingChats, scale, translatePos])
 
 
     useEffect(()=>{
@@ -96,14 +162,14 @@ export function DrawingRoomClient({
                 if(parsedData.type === 'chat'){
                     setDrawingChats( drawingMsg => [...drawingMsg, {...parsedData.message}])
                 }
-            }
+            } 
             }, 3000)
             
         }
     }, [socket, loading])
 
     useEffect(()=>{
-        alert(currSelectedShape)
+        // alert(currSelectedShape)
     }, [currSelectedShape])
 
     useEffect(()=>{
@@ -113,6 +179,15 @@ export function DrawingRoomClient({
     useEffect(()=>{
         console.log("Yo got the chats here", drawingChats);
     }, [drawingChats])
+
+
+    useEffect(()=>{
+        const canvas = canvasRef.current;
+        if(!canvas){
+            return;
+        }     
+        setTranslatePos({x: canvas.width/2, y: canvas.height/2});
+    }, [canvasRef])
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -127,17 +202,28 @@ export function DrawingRoomClient({
             return;
         }
         
+        ctx.strokeStyle = "white";
+        
         console.log("This useEffect ran, and inside the cif statement")
         let startX : number;
         let startY: number;
         let endX: number;
         let endY: number;
+        const startDrag = {x: 0, y: 0};
 
         let mouseDownHap = false;
+        const rect = canvas.getBoundingClientRect();
 
         const mouseDownHandler = (e: MouseEvent)=>{
-            startX = e.clientX;
-            startY = e.clientY;
+            setPanning(true)
+            startX = (e.clientX - rect.left - translatePos.x) / scale;
+            startY = (e.clientY - rect.top - translatePos.y) / scale;
+            // startX = e.clientX
+            // startY = e.clientY
+
+            //here
+            startDrag.x = e.clientX 
+            startDrag.y = e.clientY
             
             mouseDownHap=true;
         }
@@ -146,33 +232,65 @@ export function DrawingRoomClient({
         const mouseMoveHandler = (e: MouseEvent)=>{
             if(mouseDownHap){
                 // alert(`in here ${currSelectedShape}`)
+                const realX = (e.clientX - rect.left - translatePos.x) / scale;
+                const realY = (e.clientY - rect.top - translatePos.y) / scale;
+                // const realX = e.clientX 
+                // const realY = e.clientY 
+
+                ctx.save();
+                ctx.translate(translatePos.x, translatePos.y);
+                ctx.scale(scale, scale);
                 if(currSelectedShape === "Rectangle"){
+                    ctx.save()
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);  
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawRectangle(ctx, startX, startY, e.clientX, e.clientY);
+                    ctx.restore()
+                    drawRectangle(ctx, startX, startY, realX, realY);
                 }else if(currSelectedShape === "Circle"){
+                    ctx.save()
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);  
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawCircle(ctx, startX, startY, e.clientX);
+                    ctx.restore()
+                    drawCircle(ctx, startX, startY, realX);
                 }else if(currSelectedShape === "Diamond"){
+                    ctx.save()
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);  
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawDiamond(ctx, startX, startY, e.clientX, e.clientY);
+                    ctx.restore()
+                    drawDiamond(ctx, startX, startY, realX, realY);
                 }else if(currSelectedShape === "Arrow"){
+                    ctx.save()
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);  
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawArrow(ctx, startX, startY, e.clientX, e.clientY)
-                } 
+                    ctx.restore()
+                    drawArrow(ctx, startX, startY, realX, realY)
+                }else if(currSelectedShape === "Pan"){
+                    setTranslatePos((oldPos)=> ({x: oldPos.x + (e.clientX - startDrag.x)*0.1, y: oldPos.y + (e.clientY - startDrag.y)*0.1}))
+                    //trigger a state
+                    // setRedraw((prev)=>!prev);
+                }
+                ctx.restore();
             }
         }
         canvas.addEventListener('mousemove', mouseMoveHandler)
 
         const mouseUpHandler = (e: MouseEvent)=>{
-            endX = e.clientX;
-            endY = e.clientY;
+            setPanning(false)
+            endX = (e.clientX - rect.left - translatePos.x) / scale;
+            endY = (e.clientY - rect.top - translatePos.y) / scale;
+            // endX = e.clientX
+            // endY = e.clientY 
             let newEntryInChat: any = {};
             let someShapeWasMade = false;
 
-            
+            ctx.save();
+            ctx.translate(translatePos.x, translatePos.y);
+            ctx.scale(scale, scale);
             if(currSelectedShape === "Rectangle"){
-                
+                ctx.save()
+                ctx.setTransform(1, 0, 0, 1, 0, 0);  
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore()
                 drawRectangle(ctx, startX, startY, endX, endY);
                 newEntryInChat = {
                     "shapeName": "Rectangle",
@@ -183,8 +301,10 @@ export function DrawingRoomClient({
                 }
                 someShapeWasMade = true;
             }else if(currSelectedShape === "Circle"){
-                
+                ctx.save()
+                ctx.setTransform(1, 0, 0, 1, 0, 0);  
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore()
                 drawCircle(ctx, startX, startY, endX);
                 newEntryInChat = {
                     "shapeName": "Circle",
@@ -195,8 +315,10 @@ export function DrawingRoomClient({
                 }
                 someShapeWasMade = true;
             }else if(currSelectedShape === "Diamond"){
-                
+                ctx.save()
+                ctx.setTransform(1, 0, 0, 1, 0, 0);  
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore()
                 drawDiamond(ctx, startX, startY, endX, endY);
                 newEntryInChat = {
                     "shapeName": "Diamond",
@@ -207,7 +329,10 @@ export function DrawingRoomClient({
                 }
                 someShapeWasMade = true;
             }else if(currSelectedShape === "Arrow"){
+                ctx.save()
+                ctx.setTransform(1, 0, 0, 1, 0, 0);  
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore()
                 drawArrow(ctx, startX, startY, endX, endY);
                 newEntryInChat = {
                     "shapeName": "Arrow",
@@ -228,6 +353,7 @@ export function DrawingRoomClient({
                 setYInput(startY);
                 setCtxInput(ctx);
             }
+            ctx.restore();
             
             if(someShapeWasMade){
                 setDrawingChats((val) => [...val, {...newEntryInChat}])
@@ -254,19 +380,27 @@ export function DrawingRoomClient({
             canvas.removeEventListener('mouseup', mouseUpHandler);
         }
 
-    }, [socket, loading, currSelectedShape, id])
+    }, [socket, loading, currSelectedShape, id, scale])
 
-    useEffect(()=>{
-        window.addEventListener('resize', (e)=>{
-            if(canvasRef.current){
-                const canvas = canvasRef.current;
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                // const ctx = canvas.getContext('2d');
-                // setCanvasCtx(ctx);
-            }
-        })
-    }, [])
+    
+
+    // useEffect(()=>{
+    //     const handleResize = ()=>{
+    //         const canvas = canvasRef.current;
+    //         if(canvasRef.current){
+    //             const ctx = canvas.getContext('2d');
+    //             ctx?.save();
+    //             const canvas = canvasRef.current;
+    //             canvas.width = window.innerWidth;
+    //             canvas.height = window.innerHeight;
+    //             ctx?.restore();
+    //         }
+    //     }
+    //     window.addEventListener('resize', handleResize);
+    //     return ()=>{
+    //         window.removeEventListener('resize', handleResize);
+    //     }
+    // }, [])
 
     const generateDiagramHandler = async(ctx: CanvasRenderingContext2D, startX: number, startY: number, text: string)=>{
         try{
@@ -282,19 +416,52 @@ export function DrawingRoomClient({
             withCredentials: true
         })
         console.log("Got the response: ", response);
-        const ans = JSON.parse(response.data.answer)
+        const resp = response.data.answer.match(/\[\s*{[\s\S]*?}\s*\]/)
+
+        // const ans = JSON.parse(response.data.answer)
+        const ans = JSON.parse(resp)
+        //send to socket:
+        ans.map((val:any)=>{
+
+            socket?.send(JSON.stringify({
+                type: "chat",
+                roomId: id,
+                message: val
+            }))
+            //transaction in db: so that all of these shapes should be saved otherwise none of it should be?
+        })
+
+        //one by one add all of them to drawingChats[ ]
         ans.map((val:any)=>{setDrawingChats((oldVal)=> [...oldVal, {...val}])})
         return;
-        //one by one add all of them to drawingChats[ ]
-
-        //socket.send()
         }catch(e){
             console.log("Error in getting the diagram generated: ", e)
         } 
     }
 
+    const generateOnClickHandler = async ()=>{
+        setStartAiInput(false);
+        if(aiInput && ctxInput && xInput && yInput){
+            setCurrSelectedShape("Pointer");
+            setAiAnswerGenerating(true);
+            try{
+                await generateDiagramHandler(ctxInput, xInput, yInput, aiInput);
+            }catch(e: any){
+                alert("Some error occured.")
+                console.log("Error here in button click handler ", e.message);
+            }
+        }
+        setAiInput("");
+        setXInput(null);
+        setYInput(null);
+        setCtxInput(null);
+        setAiAnswerGenerating(false);
+        //also add it in drawingChats[] and socket.send()
+        //maybe create new DB table for this
+    }
+
     return (
-        <div>
+        <div className={`overflow-hidden h-full w-full ${currSelectedShape=="Pan"? ("cursor-grab"):("")} ${(currSelectedShape=="Pan" && panning)? ("cursor-grabbing"):("")} ${(currSelectedShape=="Rectangle" || currSelectedShape=="Circle" || currSelectedShape=="Diamond" || currSelectedShape=="Arrow" )? ("cursor-crosshair"):("")}`}>
             {/* {drawingChats.map((val, idx)=>{
                 return (<div style={{color: 'red'}} key={idx}>
                     {val.message}
@@ -302,13 +469,14 @@ export function DrawingRoomClient({
             })} */}
 
             <canvas width={window.innerWidth} height={window.innerHeight} ref={canvasRef}
-            style={{"backgroundColor": "white", "margin": 0, "padding": 0, "display": "block", position: 'absolute', top: 0, left: 0, zIndex: 0 }}>
+            style={{"backgroundColor": "black", "margin": 0, "padding": 0, "display": "block" , position: 'absolute', top: 0, left: 0, zIndex: 0, height: '100vh', width: '100vw' }} >
             </canvas>
             {startInputTaking && xInput && yInput && <input value={ inputText } onChange={(e)=>{ setInputText(e.target.value)}} onKeyDown={(e)=>{
                 if(e.key === 'Enter'){
                     if(ctxInput && xInput && yInput){
-                        ctxInput.font = "20px serif";
-                        ctxInput.fillText(inputText, xInput, yInput);
+                        ctxInput.fillStyle = "white"
+                        ctxInput.font = "16px serif";
+                        ctxInput.fillText(inputText, xInput, yInput+10);
                         //Send to the ws server
                         const newEntryInChat = {
                             "shapeName": "Text",
@@ -332,42 +500,83 @@ export function DrawingRoomClient({
                     setInputText("");
                     setCtxInput(null);
                 }
-            }} style={{position: 'absolute', top: yInput, left: xInput,backgroundColor: "transparent", border: "none", outline: "none", color: "black", caretColor: "black", fontSize: "20px" }} ref={inputRef}>
+            }} style={{position: 'absolute', top: yInput, left: xInput,backgroundColor: "transparent", border: "none", outline: "none", color: "white", caretColor: "white", fontSize: "16px" }} ref={inputRef} className="caret-white"> 
             </input>}
 
             <span style={{display: 'flex', flexDirection: 'column', position: 'absolute', top: 100, left: 0, zIndex: 10}}>
-                <button id='Pointer' onClick={()=>{setCurrSelectedShape("Pointer")}}>Pointer</button>
-                <button id='Rectangle' onClick={()=>{setCurrSelectedShape("Rectangle")}}>Rectangle</button>
-                <button id='Circle' onClick={()=>{setCurrSelectedShape("Circle")}}>Circle</button>
-                <button id='Diamond' onClick={()=>{setCurrSelectedShape("Diamond")}}>Diamond</button>
-                <button id='Arrow' onClick={()=>{setCurrSelectedShape("Arrow")}}>Arrow</button>
-                <button id='Text' onClick={()=>{setCurrSelectedShape("Text")}}>Text</button>
-                <button id='AI' onClick={()=>{setCurrSelectedShape("AI")}}>AI</button>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center py-[2px] rounded-md w-full h-full items-center flex justify-center  px-1 ${currSelectedShape=="Pointer"? ("bg-gray-900/90"):("")}`}>
+                    <button className={` text-white`} id='Pointer' onClick={()=>{setCurrSelectedShape("Pointer")}}><MousePointer/></button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[3px]  px-1 ${currSelectedShape=="Pan"? ("bg-gray-900/90"):("")} `}>
+                <button id='Pan' className="text-white" onClick={()=>{setCurrSelectedShape("Pan")}}><Hand/></button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[3px]  px-1 ${currSelectedShape=="Rectangle"? ("bg-gray-900/90"):("")}`}>
+                <button id='Rectangle' className="text-white" onClick={()=>{setCurrSelectedShape("Rectangle")}}><RectangleHorizontal/></button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px]  px-1 ${currSelectedShape=="Circle"? ("bg-gray-900/90"):("")}`}>
+                <button id='Circle' className="text-white" onClick={()=>{setCurrSelectedShape("Circle")}}><Circle/></button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px]  px-1 ${currSelectedShape=="Diamond"? ("bg-gray-900/90"):("")}`}>
+                <button id='Diamond' className="text-white" onClick={()=>{setCurrSelectedShape("Diamond")}}><Diamond/></button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px]  px-1 ${currSelectedShape=="Arrow"? ("bg-gray-900/90"):("")}`}>
+                <button id='Arrow' className="text-white" onClick={()=>{setCurrSelectedShape("Arrow")}}><ArrowUp/></button>
+                </span>
+                </span>
+
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px]  px-1 ${currSelectedShape=="Text"? ("bg-gray-900/90"):("")}`}>
+                <button id='Text' className="text-white" onClick={()=>{
+                    setCurrSelectedShape("Text")}}>
+                    <ALargeSmall/>
+                </button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className={`bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px]  px-1 ${currSelectedShape=="AI"? ("bg-gray-900/90"):("")}`}>
+                <button id='AI' className="text-white font-bold" onClick={()=>{setCurrSelectedShape("AI")}}>AI</button>
+                </span>
+                </span>
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className="bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px] px-1">
+                <button id="ZoomIn" className="text-white" onClick={()=>{
+                    const scl = scale/scaleMultiplier;
+                    setScale(scl);
+                    //draw again: the appropriate useEffect is getting triggered to run again
+                }}><Plus/></button>
+                </span>
+                </span>
+
+                <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
+                <span className="bg-gray-900/60 text-center rounded-md w-full h-full items-center flex justify-center py-[2px]  px-1">
+                <button id="ZoomOut" className="text-white" onClick={()=>{
+                    const scl = scale*scaleMultiplier;
+                    setScale(scl);
+                }}><Minus/></button>
+                </span>
+                </span>
             </span>
             {startAiInput && <div style={{display: 'flex', flexDirection: 'row', position: 'absolute', left: '50vw', top: '50vh'}}>
-                <input value={aiInput} onChange={(e)=>{setAiInput(e.target.value)}} placeholder="Add you text here"></input>
-                <button onClick={async ()=>{
-                    if(aiInput && ctxInput && xInput && yInput){
-                        setCurrSelectedShape("Pointer");
-                        setAiAnswerGenerating(true);
-                        try{
-                            await generateDiagramHandler(ctxInput, xInput, yInput, aiInput);
-                        }catch(e: any){
-                            console.log("Error here in button click handler ", e.message);
-                        }
+                <input autoFocus={true} className="caret-white text-white p-2 focus:outline-none focus:ring-0 border border-blue-700 translate(-50%, -50%)" value={aiInput} onChange={(e)=>{setAiInput(e.target.value)}} placeholder="Add you text here" onKeyDown={(e)=>{ 
+                    if(e.key == "Enter"){
+                        generateOnClickHandler();
                     }
-                    setAiInput("");
-                    setXInput(null);
-                    setYInput(null);
-                    setCtxInput(null);
-                    setStartAiInput(false);
-                    setAiAnswerGenerating(false);
-                    //also add it in drawingChats[] and socket.send()
-                    //maybe create new DB table for this
-                }}>Generate</button>
+                    }}></input>
+                <button className="text-white font-bold  border bg-blue-700 p-2 rounded-r-md border-blue-700" onClick={generateOnClickHandler}>Generate</button>
             </div>
             }
-            {aiAnswerGenerating && <div style={{display: 'flex', position: 'absolute', top: '50vh', left: '50vw', color: 'black'}}>Loading ....</div>}
+            {aiAnswerGenerating && <div className="text-3xl translate(-50%, -50%) items-center justify-centera" style={{display: 'flex', position: 'absolute', top: '50vh', left: '50vw', color: 'white'}}>Generating <span className="inline-block w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"/></div>}
 
             {/* add two conditional checks before rendering the input element */}
         </div>

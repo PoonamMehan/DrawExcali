@@ -32,7 +32,7 @@ export function drawArrow(ctx: CanvasRenderingContext2D, startX: number, startY:
     const x = endX;
     const y = endY;
 
-    const headLength = 10;
+    const headLength = 20;
     const angle = Math.atan2(endY - startY, endX - startX);
 
     ctx.beginPath();
@@ -58,6 +58,8 @@ export function drawArrow(ctx: CanvasRenderingContext2D, startX: number, startY:
 }
 
 export function drawText(ctx: CanvasRenderingContext2D, startX: number, startY: number, text: string){
-    ctx.font = "20px serif";
-    ctx.fillText(text, startX, startY);
+    ctx.fillStyle = "white"
+    ctx.strokeStyle = "white";
+    ctx.font = "16px serif";
+    ctx.fillText(text, startX, startY+10);
 }
