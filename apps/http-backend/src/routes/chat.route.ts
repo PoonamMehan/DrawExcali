@@ -28,6 +28,6 @@ const generateAnswerFromAI = async (req:UserReq, res: Response)=>{
 }
 
 
-router.route('/generateAnswer').post(jwtVerifier, generateAnswerFromAI);
+router.route('/generateAnswer').post(jwtVerifier as any, generateAnswerFromAI);
 
 export {router}

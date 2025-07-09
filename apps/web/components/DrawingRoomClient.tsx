@@ -163,7 +163,7 @@ export function DrawingRoomClient({
                     setDrawingChats( drawingMsg => [...drawingMsg, {...parsedData.message}])
                 }
             } 
-            }, 3000)
+            }, 1000)
             
         }
     }, [socket, loading])

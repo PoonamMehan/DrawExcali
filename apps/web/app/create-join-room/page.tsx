@@ -85,13 +85,6 @@ export default function CreateJoinRoom(){
     }
 
     return(
-        // <div>
-        //     <div>Create/Join room</div>
-        //     {inputErr && <div>{inputErr}</div>}
-        //     <input placeholder="Room name" value={roomName} onChange={(e)=>{setRoomName(e.target.value)}}></input>
-        //     <button onClick={createRoomHandler}>Create Room</button>
-        //     <button onClick={joinRoomHandler}>Join Room</button>
-        // </div>
         <div className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-16">
             <div className="w-full max-w-md bg-gray-900/60 border border-gray-800 rounded-2xl p-8 shadow-lg backdrop-blur-md">
                 <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-400 to-yellow-400 bg-clip-text text-transparent">

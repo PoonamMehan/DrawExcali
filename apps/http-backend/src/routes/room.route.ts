@@ -145,9 +145,9 @@ const getRoomId = async(req: UserReq, res: Response)=>{
 }
 
 
-router.route("/create-room").post(jwtVerifier, createRoomHandler as any);
-router.route("/getChat/:roomId").get(jwtVerifier, getOldChatsHandler);
-router.route("/get-roomId").post(jwtVerifier, getRoomId as any);
+router.route("/create-room").post(jwtVerifier as any, createRoomHandler as any);
+router.route("/getChat/:roomId").get(jwtVerifier as any, getOldChatsHandler);
+router.route("/get-roomId").post(jwtVerifier as any, getRoomId as any);
 
 
 export {router};

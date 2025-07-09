@@ -65,13 +65,6 @@ export default function Login (){
     }
 
     return(
-        // <div >
-        //     <div>Welcome to DrawAI</div>
-        //     {inputErr && <div>{inputErr}</div>}
-        //     <input placeholder="Email" value={emailInput} onChange={(e)=>{setEmailInput(e.target.value)}} className="p-4"></input>
-        //     <input placeholder="Password"  value={passwordInput} onChange={(e)=>{setPasswordInput(e.target.value)}}></input>
-        //     <button onClick={loginHandler} className="p-4 ">Submit</button>
-        // </div>
         <div className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-16">
             <div className="w-full max-w-md bg-gray-900/60 border border-gray-800 rounded-2xl p-8 shadow-lg backdrop-blur-md">
             <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-400 to-yellow-400 bg-clip-text text-transparent">
