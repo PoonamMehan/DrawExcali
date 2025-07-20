@@ -45,7 +45,8 @@ export function DrawingRoomClient({
     // const [ translatePos, setTranslatePos ] = useState({ x:(window.innerWidth/2)-2500, y:(window.innerHeight/2)-2500});
     const [ translatePos, setTranslatePos ] = useState({ x:0, y:0 });
     const [panning, setPanning] = useState(false)
-
+    const [coordInputBoxX, setCoordInputBoxX] = useState<number | null>(null)
+    const [coordInputBoxY, setCoordInputBoxY] = useState<number | null>(null)
     
 
     useEffect(()=>{
@@ -347,6 +348,8 @@ export function DrawingRoomClient({
                 setXInput(startX);
                 setYInput(startY);
                 setCtxInput(ctx);
+                setCoordInputBoxX(e.clientX);
+                setCoordInputBoxY(e.clientY);
             }else if( currSelectedShape === "AI"){
                 setStartAiInput(true);
                 setXInput(startX);
@@ -469,9 +472,9 @@ export function DrawingRoomClient({
             })} */}
 
             <canvas width={window.innerWidth} height={window.innerHeight} ref={canvasRef}
-            style={{"backgroundColor": "black", "margin": 0, "padding": 0, "display": "block" , position: 'absolute', top: 0, left: 0, zIndex: 0, height: '100vh', width: '100vw' }} >
+            style={{"backgroundColor": "black", "margin": 0, "padding": 0, "display": "block" , position: 'relative', top: 0, left: 0, zIndex: 0, height: '100vh', width: '100vw' }} >
             </canvas>
-            {startInputTaking && xInput && yInput && <input value={ inputText } onChange={(e)=>{ setInputText(e.target.value)}} onKeyDown={(e)=>{
+            {startInputTaking && xInput && yInput && coordInputBoxX && coordInputBoxY && <input value={ inputText } onChange={(e)=>{ setInputText(e.target.value)}} onKeyDown={(e)=>{
                 if(e.key === 'Enter'){
                     if(ctxInput && xInput && yInput){
                         ctxInput.fillStyle = "white"
@@ -499,8 +502,11 @@ export function DrawingRoomClient({
                     setStartInputTaking(false);
                     setInputText("");
                     setCtxInput(null);
+                    setCoordInputBoxX(null)
+                    setCoordInputBoxY(null)
+                    setCurrSelectedShape("Pointer")
                 }
-            }} style={{position: 'absolute', top: yInput, left: xInput,backgroundColor: "transparent", border: "none", outline: "none", color: "white", caretColor: "white", fontSize: "16px" }} ref={inputRef} className="caret-white"> 
+            }} style={{position: 'absolute', top: coordInputBoxY, left: coordInputBoxX, backgroundColor: "transparent", fontSize: "16px" }} ref={inputRef} className="caret-white text-white font-[16px] bg-transparent outline-0 border-none"> 
             </input>}
 
             <span style={{display: 'flex', flexDirection: 'column', position: 'absolute', top: 100, left: 0, zIndex: 10}}>

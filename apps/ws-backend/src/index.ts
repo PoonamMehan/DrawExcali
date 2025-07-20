@@ -196,6 +196,7 @@ wss.on('connection', async function connection(ws, request){
                         if(!currUser){
                             throw new Error("User's key does not have a valid ws obj.")
                         }
+                        console.log("Sent data to: ", key, " the message sent is: ", parsedData.message)
                         const websocObj = currUser["ws"]
                         websocObj.send(JSON.stringify({
                             type: "chat",
