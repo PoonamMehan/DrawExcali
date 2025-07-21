@@ -1,0 +1,16 @@
+FROM node:22-alpine
+WORKDIR /app
+
+COPY ./apps/ws-backend ./apps/ws-backend
+COPY ./packages ./packages
+COPY ./package.json .
+COPY ./package-lock.json .
+COPY ./turbo.json .
+
+RUN npm install
+RUN npm run db:generate
+RUN npm run build
+
+EXPOSE 8000
+
+CMD ["npm", "run", "start"]
