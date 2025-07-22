@@ -13,7 +13,8 @@ interface UserData {
 }
 
 const users: Record<string, Record<string, UserData>> = {};
-const wss = new WebSocketServer({ port: 8080});
+const port: number = parseInt(process.env.PORT as string) || 8080
+const wss = new WebSocketServer({ port: port});
 
 const checkAuthorization = (token: string): string | null=>{
     const envVars = parsedEnvVars.data;
