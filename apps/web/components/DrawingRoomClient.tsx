@@ -408,7 +408,7 @@ export function DrawingRoomClient({
     const generateDiagramHandler = async(ctx: CanvasRenderingContext2D, startX: number, startY: number, text: string)=>{
         try{
             const response = await axios({
-            url: `/api/chat/generateAnswer`,
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/generateAnswer`,
             method: 'post',
             data: {
                 text: `XCoordinate=${startX}, YCoordinate=${startY}. Text=${text}`

@@ -43,7 +43,7 @@ export default function Signup (){
 
         axios({
             method: 'post',
-            url: `/api/user/signup`,
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/signup`,
             data: parsedData.data,
             withCredentials: true
         }).then(function (response){
@@ -52,7 +52,7 @@ export default function Signup (){
             //now signed up, let's automatically sign the user in
             axios({
                 method: 'post',
-                url: `/api/user/login`,
+                url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/login`,
                 data: {
                     email: parsedData.data.email,
                     password: parsedData.data.password

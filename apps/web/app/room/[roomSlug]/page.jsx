@@ -19,7 +19,7 @@ export default function CollaborativeCanvas(){
         const getRoomId = ()=>{
             axios({
                 method: 'post',
-                url: `/api/room/get-roomId`,
+                url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/get-roomId`,
                 data: {
                     roomSlug: params.roomSlug
                 },

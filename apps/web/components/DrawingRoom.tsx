@@ -22,7 +22,7 @@ export function DrawingRoom({id}:{id: number}){
         const getOldMsgs = async()=>{
             axios({
                 method: 'get',
-                url: `/api/room/getChat/${id}`,
+                url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/getChat/${id}`,
                 headers: {
                     'Authorization': token,
                 },

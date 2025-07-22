@@ -28,7 +28,7 @@ export default function CreateJoinRoom(){
         const token = localStorage.getItem('Token');
         axios({
             method: 'post',
-            url: `/api/room/create-room`,
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/create-room`,
             data: {
                 'name': roomName
             },
@@ -56,7 +56,7 @@ export default function CreateJoinRoom(){
         const token = localStorage.getItem("Token");
         axios({
             method: 'post',
-            url: `/api/room/get-roomId`,
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/get-roomId`,
             data: {
                 'roomSlug': slug,
             },
