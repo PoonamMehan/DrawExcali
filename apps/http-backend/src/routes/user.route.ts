@@ -142,7 +142,7 @@ const loginHandler = async(req:Request, res: Response) => {
 }
 
 router.route('/signup').post(signupHandler as any);
-router.route('login').post(loginHandler as any);
+router.route('/login').post(loginHandler as any);
 
 export { router };
 
