@@ -38,7 +38,7 @@ export default function Login (){
 
         axios({
             method: 'post',
-            url: `/api/user/login`,
+            url: `http://localhost:8000/api/user/login`,
             data: parsedData.data,
             withCredentials: true
         }).then(function (response){
