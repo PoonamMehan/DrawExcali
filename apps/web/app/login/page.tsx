@@ -39,8 +39,7 @@ export default function Login (){
         axios({
             method: 'post',
             url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/login`,
-            data: parsedData.data,
-            withCredentials: true
+            data: parsedData.data
         }).then(function (response){
             console.log("response", response);
             const token = response.headers["authorization"]
