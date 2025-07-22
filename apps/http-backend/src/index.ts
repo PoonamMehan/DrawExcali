@@ -27,7 +27,7 @@ app.get("/", (req: Request, res: Response)=>{
     res.send("Wroking")
 })
 
-app.use("api/user", userRouter);
+app.use("/api/user", userRouter);
 
 app.use("/api/room", roomRouter);
 
