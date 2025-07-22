@@ -27,7 +27,7 @@ app.get("/", (req: Request, res: Response)=>{
     res.send("Wroking")
 })
 
-app.use("/api/user", userRouter);
+app.use("api/user", userRouter);
 
 app.use("/api/room", roomRouter);
 
@@ -36,7 +36,7 @@ app.use("/api/chat", chatRouter);
 const port = process.env.PORT || 8000
 
 const server = app.listen(port, ()=>{
-    console.log("Server is listening on port 8000")
+    console.log("Server is listening on port: ", port)
 })
 
 console.log(process.env.ACCESS_TOKEN_SECRET)

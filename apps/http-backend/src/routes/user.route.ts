@@ -75,6 +75,7 @@ const signupHandler = async(req: Request, res: Response) => {
 }
 
 const loginHandler = async(req:Request, res: Response) => {
+    console.log("user came here /login")
     const inputData = LoginSchema.safeParse(req.body)
     if(!inputData.success){
         return res.status(400).json({
@@ -141,7 +142,7 @@ const loginHandler = async(req:Request, res: Response) => {
 }
 
 router.route('/signup').post(signupHandler as any);
-router.route('/login').post(loginHandler as any);
+router.route('login').post(loginHandler as any);
 
 export { router };
 
