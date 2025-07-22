@@ -53,9 +53,11 @@ export default function Login (){
             setClicked(false)
             if(err.status < 500 && err.status >= 400){
                 setInputErr(err.response.data.errorMessage);
+                console.log(err)
                 return;
             }else if(err.status >= 500 && err.status < 600){
                 setInputErr("Some error happened on our side, login again.")
+                console.log(err)
                 return
             }
             setInputErr("Some error happened on our side, try again.")
