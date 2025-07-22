@@ -10,17 +10,19 @@
   "type": "module",
   "devDependencies": {
     "@repo/db": "*",
+    "@repo/types": "*",
     "@repo/typescript-config": "*",
     "@types/ws": "^8.18.1",
-    "typescript": "^5.8.3",
-    "@repo/types": "*"
+    "typescript": "^5.8.3"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "dotenv": "^16.5.0",
+    "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.2"
   }
 }

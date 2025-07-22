@@ -9,3 +9,4 @@ export default {
         ]
     }
 };
+// "http://draw_backend_running:8000/api/:path*"

@@ -3,7 +3,7 @@ import { useSocket } from "../hooks/useSocket"
 import { useState, useEffect, useRef } from "react";
 import { drawArrow, drawCircle, drawDiamond, drawRectangle, drawText } from "../utils/allShapes";
 import axios from 'axios';
-import { MousePointer, RectangleHorizontal, Circle, Diamond, ArrowUp, ALargeSmall, Plus, Minus, Hand } from 'lucide-react';
+import { MousePointer, RectangleHorizontal, Circle, Diamond, ArrowUp, ALargeSmall, Plus, Minus, Hand, Dot } from 'lucide-react';
 
 
 export function DrawingRoomClient({
@@ -47,7 +47,7 @@ export function DrawingRoomClient({
     const [panning, setPanning] = useState(false)
     const [coordInputBoxX, setCoordInputBoxX] = useState<number | null>(null)
     const [coordInputBoxY, setCoordInputBoxY] = useState<number | null>(null)
-    
+    const [connected, setConnected] = useState(false)
 
     useEffect(()=>{
         if(startInputTaking && inputRef.current){
@@ -150,21 +150,21 @@ export function DrawingRoomClient({
     useEffect(()=>{
         console.log("old chats", drawingChats);
         if(socket && !loading){
-            console.log("here inside setting up event listeners on socket")
+            console.log("here inside setting up event listeners on socket", socket, loading)  
             setTimeout(()=>{
                 socket.send(JSON.stringify({
                 "type": "join_room",
                 "roomId": `${id}`
             }))
-
-            socket.onmessage = (event)=>{
-                const parsedData = JSON.parse(event.data);
-                console.log("new drawing message arrived ", parsedData)
-                if(parsedData.type === 'chat'){
-                    setDrawingChats( drawingMsg => [...drawingMsg, {...parsedData.message}])
-                }
-            } 
-            }, 1000)
+                setConnected(true)
+                socket.onmessage = (event)=>{
+                    const parsedData = JSON.parse(event.data);
+                    console.log("new drawing message arrived ", parsedData)
+                    if(parsedData.type === 'chat'){
+                        setDrawingChats( drawingMsg => [...drawingMsg, {...parsedData.message}])
+                    }
+                } 
+            }, 2000)
             
         }
     }, [socket, loading])
@@ -408,7 +408,7 @@ export function DrawingRoomClient({
     const generateDiagramHandler = async(ctx: CanvasRenderingContext2D, startX: number, startY: number, text: string)=>{
         try{
             const response = await axios({
-            url: '/api/chat/generateAnswer',
+            url: `/api/chat/generateAnswer`,
             method: 'post',
             data: {
                 text: `XCoordinate=${startX}, YCoordinate=${startY}. Text=${text}`
@@ -508,7 +508,7 @@ export function DrawingRoomClient({
                 }
             }} style={{position: 'absolute', top: coordInputBoxY, left: coordInputBoxX, backgroundColor: "transparent", fontSize: "16px" }} ref={inputRef} className="caret-white text-white font-[16px] bg-transparent outline-0 border-none"> 
             </input>}
-
+            {connected && <span className="flex absolute text-[#34D399] top-1 left-1 z-40 text-sm "><Dot color="#34D399"/>Connected</span>}
             <span style={{display: 'flex', flexDirection: 'column', position: 'absolute', top: 100, left: 0, zIndex: 10}}>
                 <span className="p-[2px] rounded-md bg-gradient-to-r from-blue-600 to-yellow-600 text-center inline-block mb-3 ml-3">
                 <span className={`bg-gray-900/60 text-center py-[2px] rounded-md w-full h-full items-center flex justify-center  px-1 ${currSelectedShape=="Pointer"? ("bg-gray-900/90"):("")}`}>

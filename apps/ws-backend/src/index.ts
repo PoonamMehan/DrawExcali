@@ -32,6 +32,7 @@ const checkAuthorization = (token: string): string | null=>{
     console.log("Decoded Token", decodedToken);
     //db verification
     if(!decodedToken || typeof decodedToken === "string" || !decodedToken.userId ){
+        console.log("Returning null, user not authenticated")
         return null;
     }
 
@@ -73,8 +74,10 @@ wss.on('connection', async function connection(ws, request){
                 id: userId
             }
         })
+            console.log("here3 ")
 
         if(!userInDb){
+            console.log("here2 error")
             ws.send(JSON.stringify({
             type: "error",
             message: "Authentication failed, wrong token."
@@ -90,13 +93,16 @@ wss.on('connection', async function connection(ws, request){
         return;
     }
     
+    console.log("here1")
     //on connecting, add the user to this first array which has all the users.
     users["allConnectedUsers"] = {...users["allConnectedUsers"], [userId]: { ws: ws }}
+    console.log("Ek baari users: ", users)
 
     ws.on('message', async function message(data){
         const dataStringified = data.toString();
         console.log(dataStringified);
         if(typeof dataStringified !== 'string'){
+            console.log("here4 err")
             ws.send(JSON.stringify({
                 type: "error",
                 message: "Send data in correct format."
@@ -106,6 +112,7 @@ wss.on('connection', async function connection(ws, request){
         const parsedData = JSON.parse(dataStringified);
         
         if(parsedData.type === "join_room"){
+            console.log("here5")
             console.log("users", users)
 
             if(!users["allConnectedUsers"]){
