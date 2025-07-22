@@ -18,7 +18,8 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cors({
     origin: "https://drawai-5fed.onrender.com",
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['Authorization']
 }))
 app.use(cookieParser());
 

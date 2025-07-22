@@ -131,8 +131,10 @@ const loginHandler = async(req:Request, res: Response) => {
         userId: userData.id,
         email: userData.email
     }
-    
+
+    console.log("here, env var: ", envVars.ACCESS_TOKEN_SECRET)
     const token = jwt.sign(payload, envVars.ACCESS_TOKEN_SECRET, { expiresIn: '200d' })
+    console.log("token generated: ", token)
 
     return res.status(200).set('Authorization', `Bearer ${token}`).json({
         userData: {
