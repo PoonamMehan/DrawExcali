@@ -13,7 +13,7 @@ export default function CollaborativeCanvas(){
 
     
     useEffect(()=>{
-        const tkn = (localStorage.getItem("Token"));
+        const tkn = localStorage.getItem("Token");
         // console.log("yo", tkn)
         // setToken(tkn);
         const getRoomId = ()=>{
