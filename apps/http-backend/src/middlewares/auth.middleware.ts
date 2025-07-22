@@ -6,9 +6,6 @@ import { prisma } from '@repo/db/index';
 export const jwtVerifier = async (req: UserReq, res:Response, next: NextFunction)=>{
     try{
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-        console.log("Token ", token)
-        console.log("Here1 ", req.header("Authorization"))
-        console.log("Here2 ", req.header('Authorization'))
         if(!token){
             return res.status(400).json({
                 errorMessage: "No token was present, neither in cookies nor in headers."
@@ -19,10 +16,7 @@ export const jwtVerifier = async (req: UserReq, res:Response, next: NextFunction
             throw new Error("Env variables not loaded properly.")
         }
         const envVars = parsedEnvVars.data;
-
-        console.log("env", envVars.ACCESS_TOKEN_SECRET)
         const decodedToken = jwt.verify(token, envVars.ACCESS_TOKEN_SECRET) 
-        console.log("decoded token: ", decodedToken)
 
         if(typeof decodedToken === "string"){
             res.status(403).json({
