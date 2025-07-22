@@ -54,6 +54,7 @@ export default function CreateJoinRoom(){
         setInputErr("")
         setClickedJR(true)
         const token = localStorage.getItem("Token");
+        console.log("Token: ", token)
         axios({
             method: 'post',
             url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/get-roomId`,
