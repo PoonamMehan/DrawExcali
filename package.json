@@ -8,7 +8,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "db:generate": "npx --prefix packages/db prisma generate",
+    "db:generate": "cd packages/db && npx prisma generate && cd ../..",
     "build:packages": "npm --prefix packages/db run build && npm --prefix packages/types run build"
   },
   "devDependencies": {
