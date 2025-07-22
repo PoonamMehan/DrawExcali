@@ -22,7 +22,7 @@
   },
   "packageManager": "npm@10.9.2",
   "workspaces": [
-    "apps/http-backend",
+    "apps/ws-backend",
     "packages/*"
   ],
   "dependencies": {
