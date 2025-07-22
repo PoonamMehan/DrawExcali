@@ -39,10 +39,12 @@ export default function Login (){
         axios({
             method: 'post',
             url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/login`,
-            data: parsedData.data
+            data: parsedData.data,
+            withCredentials: true
         }).then(function (response){
             console.log("response", response);
             const token = response.headers["authorization"]
+            console.log("TOken in login: ", token)
             localStorage.setItem("Token", token);
             router.push('/create-join-room');
             setEmailInput("");
